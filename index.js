@@ -30,3 +30,35 @@ app.get("/api/hello", function (req, res) {
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
+
+
+// My code
+app.get("/api", (req,res) => {
+  currentDate = new Date()
+  currentUnix = Math.floor(currentDate.getTime() / 1000)
+  currentDateFormatted = currentDate.toUTCString()
+
+  res.json({unix: currentUnix, utc: currentDateFormatted})
+})
+
+app.get("/api/:date", (req,res) => {
+  rawPath = req.path
+  Path = rawPath.slice(5)
+
+  if (Path.includes("-")) {
+    theDate = new Date(Path)
+    formattedDate = theDate.toUTCString()
+    unixTimeMilliseconds = theDate.getTime()
+    unixTime = Math.floor(unixTimeMilliseconds/1000)
+  } else {
+    unixTime = Number(Path)
+    theDate = new Date(unixTime)
+    formattedDate = theDate.toUTCString()    
+  }
+
+  if (formattedDate === "Invalid Date") {
+    res.json({ error : "Invalid Date" })
+  } else {
+    res.json({unix: unixTime, utc: formattedDate})
+  }
+})
