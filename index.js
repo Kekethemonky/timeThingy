@@ -35,30 +35,57 @@ var listener = app.listen(process.env.PORT || 3000, function () {
 // My code
 app.get("/api", (req,res) => {
   currentDate = new Date()
-  currentUnix = Math.floor(currentDate.getTime() / 1000)
+  // currentUnix = Math.floor(currentDate.getTime() / 1000)
+  currentUnix = currentDate.getTime()
   currentDateFormatted = currentDate.toUTCString()
 
   res.json({unix: currentUnix, utc: currentDateFormatted})
 })
 
-app.get("/api/:date", (req,res) => {
-  rawPath = req.path
-  Path = rawPath.slice(5)
 
-  if (Path.includes("-")) {
-    theDate = new Date(Path)
-    formattedDate = theDate.toUTCString()
-    unixTimeMilliseconds = theDate.getTime()
-    unixTime = Math.floor(unixTimeMilliseconds/1000)
+app.get("/api/:date", (req, res) => {
+  dateParam = req.params.date
+
+  if (!isNaN(dateParam)) { // If number it will make it the unix, then turn unix to uct
+    date_string = dateParam
+    unixNumber = parseInt(date_string)
+    uct = new Date(unixNumber) 
+    uctFormatted = uct.toUTCString()
   } else {
-    unixTime = Number(Path)
-    theDate = new Date(unixTime)
-    formattedDate = theDate.toUTCString()    
+    date_string = dateParam
+    uct = new Date(date_string)
+    unixNumber = uct.getTime()
+    uctFormatted = uct.toUTCString()
   }
+  
 
-  if (formattedDate === "Invalid Date") {
+  if (isNaN(unixNumber)) {
     res.json({ error : "Invalid Date" })
   } else {
-    res.json({unix: unixTime, utc: formattedDate})
+    res.json({unix: unixNumber, utc: uctFormatted})
   }
 })
+
+
+// app.get("/api/:date", (req,res) => {
+//   rawPath = req.path
+//   Path = rawPath.slice(5)
+
+//   if (Path.includes("-")) {
+//     theDate = new Date(Path)
+//     formattedDate = theDate.toUTCString()
+//     unixTimeMilliseconds = theDate.getTime()
+//     // unixTime = Math.floor(unixTimeMilliseconds/1000)
+//     unixTime = unixTimeMilliseconds
+//   } else {
+//     unixTime = parseInt(Path)
+//     theDate = new Date(unixTime)
+//     formattedDate = theDate.toUTCString()    
+//   }
+
+//   if (formattedDate === "Invalid Date") {
+//     res.json({ error : "Invalid Date" })
+//   } else {
+//     res.json({unix: unixTime, utc: formattedDate})
+//   }
+// })
